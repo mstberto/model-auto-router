@@ -1,0 +1,39 @@
+{
+  "name": "model-auto-router",
+  "version": "1.0.12",
+  "description": "Conservative, run-only model routing through the OpenClaw Decision Runtime",
+  "type": "module",
+  "files": [
+    "index.js",
+    "index.ts",
+    "router.mjs",
+    "schema.mjs",
+    "openclaw.plugin.json",
+    "README.md",
+    "doctor-contract-api.js",
+    "LIVE-VALIDATION.md"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "openclaw": {
+    "extensions": [
+      "./index.js"
+    ],
+    "compat": {
+      "pluginApi": ">=2026.9.7 <2026.9.8"
+    },
+    "install": {
+      "minHostVersion": ">=2026.9.7"
+    }
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mstberto/model-auto-router.git"
+  },
+  "homepage": "https://github.com/mstberto/model-auto-router#readme",
+  "bugs": {
+    "url": "https://github.com/mstberto/model-auto-router/issues"
+  }
+}

@@ -1,0 +1,9 @@
+node_modules/
+*.tgz
+*.sha256
+*.zip
+.env
+.env.*
+!.env.example
+.DS_Store
+coverage/

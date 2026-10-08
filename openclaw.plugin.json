@@ -1,0 +1,121 @@
+{
+  "id": "model-auto-router",
+  "name": "Model Auto Router",
+  "description": "Conservative run-only routing using the host-configured decisionModel.",
+  "enabledByDefault": false,
+  "activation": {
+    "onStartup": true
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "enabled": {
+        "type": "boolean",
+        "default": false
+      },
+      "agentId": {
+        "type": "string",
+        "pattern": "^$|^[a-z0-9][a-z0-9_-]*$",
+        "default": ""
+      },
+      "baselineModel": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9_-]*/[^\\s/]+$",
+        "default": "openai/gpt-6-sol"
+      },
+      "fastModel": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9_-]*/[^\\s/]+$",
+        "default": "openai/gpt-6-luna"
+      },
+      "deepModel": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9_-]*/[^\\s/]+$",
+        "default": "openai/gpt-6-astra"
+      },
+      "observeOnly": {
+        "type": "boolean",
+        "default": true
+      },
+      "bufferSize": {
+        "type": "integer",
+        "minimum": 4,
+        "maximum": 6,
+        "default": 6
+      },
+      "timeoutMs": {
+        "type": "integer",
+        "minimum": 100,
+        "maximum": 2500,
+        "default": 1500
+      },
+      "minLowEffortProbability": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1,
+        "default": 0.97
+      },
+      "minConfidence": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1,
+        "default": 0.9
+      },
+      "maxHighStakesProbability": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1,
+        "default": 0.05
+      },
+      "minStandaloneProbability": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1,
+        "default": 0.98
+      },
+      "deepProbability": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 1,
+        "default": 0.7
+      },
+      "allowDecisionContent": {
+        "type": "boolean",
+        "default": false
+      }
+    }
+  },
+  "uiHints": {
+    "enabled": {
+      "label": "Enable Model Auto Router"
+    },
+    "observeOnly": {
+      "label": "Observe only",
+      "help": "Classify and log but never override a model."
+    },
+    "agentId": {
+      "label": "Agent scope"
+    },
+    "baselineModel": {
+      "label": "Baseline model",
+      "help": "Expected default model. Automatic routing only occurs when a run begins on this model."
+    },
+    "fastModel": {
+      "label": "FAST model"
+    },
+    "deepModel": {
+      "label": "DEEP model"
+    },
+    "allowDecisionContent": {
+      "label": "Allow minimized decision evidence",
+      "help": "Allow bounded prepared-prompt and recent-message evidence to reach the configured decision provider, including in observation mode."
+    }
+  },
+  "doctorContract": {
+    "configRepair": true,
+    "resolveSessionStoreAgentIds": false,
+    "sessionRouteStateOwners": false,
+    "stateMigrations": []
+  }
+}
