@@ -21,7 +21,7 @@
       "./index.js"
     ],
     "compat": {
-      "pluginApi": ">=2026.9.7 <2026.9.8"
+      "pluginApi": ">=2026.9.7"
     },
     "install": {
       "minHostVersion": ">=2026.9.7"

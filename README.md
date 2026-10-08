@@ -2,7 +2,7 @@
 
 A small removable OpenClaw plugin that classifies eligible human turns through the configured `decisionModel` and selects a conversational model for that run. No OpenClaw patches, proxy, direct TypeSafe calls, API keys, or persistent session-model writes.
 
-Version **1.0.12** targets **OpenClaw 2026.9.7**. Its declared plugin API range is `>=2026.9.7 <2026.9.8`; newer hosts require compatibility review before widening that declaration.
+Version **1.0.12** declares support for **OpenClaw 2026.9.7 and newer** (`>=2026.9.7`), with no upper version limit. The original API review targeted 2026.9.7; newer releases are allowed to load but have not all been validated.
 
 ## Current behavior
 
