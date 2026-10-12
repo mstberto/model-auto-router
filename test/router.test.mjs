@@ -217,3 +217,37 @@ test('Doctor compatibility inspection leaves configuration unchanged', async () 
   assert.deepEqual(config, before);
   assert.deepEqual(stateMigrations, []);
 });
+
+test('clear short requests and ordinary sentence prefixes reach the Decision model', async () => {
+  for (const prompt of ['2+2', 'Hi', 'Please calculate 2 plus 2.', 'Why is the sky blue?', 'Same question: what is RSVP?', 'What is a file extension?', 'What is a credit card?', 'What is an API key?']) {
+    const f = fixture();
+    assert.deepEqual(await f.route(prompt), luna, prompt);
+    assert.equal(f.calls.length, 1, prompt);
+  }
+});
+test('actual attachment references and complete ambiguous followups still skip', async () => {
+  for (const prompt of ['Analyze this image', 'Read the attached file', 'Use that attachment', 'Continue.', 'Why?', 'Do it please', 'What about that?']) {
+    const f = fixture();
+    assert.equal(await f.route(prompt), undefined, prompt);
+    assert.equal(f.calls.length, 0, prompt);
+  }
+});
+test('ordinary redaction reaches Jev with explicit missing-content evidence', async () => {
+  const f = fixture({}, async () => answer('LOW', .001, .5));
+  assert.equal(await f.route('Summarize https://example.com/private'), undefined);
+  assert.equal(f.calls.length, 1);
+  assert.equal(f.calls[0].batch.state.requestContentRedacted, true);
+  assert.ok(!JSON.stringify(f.calls).includes('https://example.com/private'));
+});
+test('credential assignments and SSNs are withheld despite relaxed topic filtering', async () => {
+  for (const prompt of ['password: hunter2', 'My secret is hunter2', 'My SSN is 123-45-6789']) {
+    const f = fixture();
+    assert.equal(await f.route(prompt), undefined);
+    assert.equal(f.calls.length, 0);
+  }
+});
+test('standalone threshold is 0.95 while effort, stakes and confidence remain strict', () => {
+  assert.equal(pickTier(answer('LOW', .03, .95), DEFAULTS).tier, 'FAST');
+  assert.equal(pickTier(answer('LOW', .03, .94), DEFAULTS).tier, 'NORMAL');
+  assert.equal(pickTier(answer('LOW', .06, .99), DEFAULTS).tier, 'NORMAL');
+});

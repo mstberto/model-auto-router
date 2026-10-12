@@ -64,7 +64,7 @@ export const CONFIG_SCHEMA = {
       "type": "number",
       "minimum": 0,
       "maximum": 1,
-      "default": 0.98
+      "default": 0.95
     },
     "deepProbability": {
       "type": "number",
