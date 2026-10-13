@@ -85,10 +85,7 @@ test('FAST routes to Luna, NORMAL retains Sol, and DEEP routes to Astra', async 
   });
 
   const highStakes = fixture({}, async () => answer('LOW', .95));
-  assert.deepEqual(await highStakes.route(), {
-    providerOverride: 'openai',
-    modelOverride: 'gpt-6-astra'
-  });
+  assert.equal(await highStakes.route(), undefined);
 
   const ambiguous = fixture({}, async () => answer('LOW', .001, .5));
   assert.equal(await ambiguous.route(), undefined);
@@ -250,4 +247,24 @@ test('standalone threshold is 0.95 while effort, stakes and confidence remain st
   assert.equal(pickTier(answer('LOW', .03, .95), DEFAULTS).tier, 'FAST');
   assert.equal(pickTier(answer('LOW', .03, .94), DEFAULTS).tier, 'NORMAL');
   assert.equal(pickTier(answer('LOW', .06, .99), DEFAULTS).tier, 'NORMAL');
+});
+
+test('Astra requires clear HIGH effort, confidence and context at threshold boundaries', () => {
+  const decision = (high, confidence, standalone, choice = 'HIGH', stakes = .99) => {
+    const a = answer('HIGH', stakes, standalone);
+    a.result.answers.effort = { type: 'choice', choice, probabilities: { LOW: 0, MEDIUM: 1 - high, HIGH: high }, confidence };
+    return a;
+  };
+  assert.equal(pickTier(decision(.90, .90, .95), DEFAULTS).tier, 'DEEP');
+  for (const a of [decision(.899, .90, .95), decision(.90, .899, .95), decision(.90, .90, .949), decision(.99, undefined, .99), decision(.99, .99, .99, 'MEDIUM')]) {
+    assert.equal(pickTier(a, DEFAULTS).tier, 'NORMAL');
+  }
+  assert.equal(pickTier(decision(.95, .95, .95, 'HIGH', .01), DEFAULTS).tier, 'DEEP');
+  assert.equal(pickTier(answer('LOW', .99, .99), DEFAULTS).tier, 'NORMAL');
+  assert.equal(pickTier(answer('MEDIUM', .99, .99), DEFAULTS).tier, 'NORMAL');
+});
+test('high-effort but unclear requests retain baseline through the hook', async () => {
+  const f = fixture({}, async () => answer('HIGH', .99, .94));
+  assert.equal(await f.route('Design a complex migration plan'), undefined);
+  assert.equal(f.calls.length, 1);
 });

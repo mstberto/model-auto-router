@@ -13,7 +13,7 @@ export const DEFAULTS = Object.freeze({
   minConfidence: 0.90,
   maxHighStakesProbability: 0.05,
   minStandaloneProbability: 0.95,
-  deepProbability: 0.70,
+  deepProbability: 0.90,
 });
 const MAX_SESSIONS = 100;
 const CONTEXT_TTL_MS = 10 * 60000;
@@ -146,10 +146,12 @@ export function pickTier(outcome, config) {
     stakes: Number(highStakes.probabilityTrue.toFixed(3)),
     standalone: Number(standalone.probabilityTrue.toFixed(3)),
   };
-  if (high >= config.deepProbability || highStakes.probabilityTrue >= config.deepProbability) {
+  if (effort.choice === "HIGH" && high >= config.deepProbability &&
+    effort.confidence !== undefined && effort.confidence >= config.minConfidence &&
+    standalone.probabilityTrue >= config.minStandaloneProbability) {
     return {
       tier: "DEEP",
-      reason: "complex-or-consequential",
+      reason: "clear-high-effort",
       metrics
     };
   }

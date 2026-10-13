@@ -1,6 +1,6 @@
 {
   "name": "model-auto-router",
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "Conservative, run-only model routing through the OpenClaw Decision Runtime",
   "type": "module",
   "files": [

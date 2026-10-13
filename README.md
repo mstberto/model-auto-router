@@ -2,7 +2,7 @@
 
 A small removable OpenClaw plugin that classifies eligible human turns through the configured `decisionModel` and selects a conversational model for that run. No OpenClaw patches, proxy, direct TypeSafe calls, API keys, or persistent session-model writes.
 
-Version **1.0.13** declares support for **OpenClaw 2026.9.7 and newer** (`>=2026.9.7`), with no upper version limit. The original API review targeted 2026.9.7; newer releases are allowed to load but have not all been validated.
+Version **1.0.14** declares support for **OpenClaw 2026.9.7 and newer** (`>=2026.9.7`), with no upper version limit. The original API review targeted 2026.9.7; newer releases are allowed to load but have not all been validated.
 
 ## Current behavior
 
@@ -16,9 +16,13 @@ The default baseline is `openai/gpt-6-sol`. Only runs starting on `baselineModel
 
 These defaults differ from the original single-agent release, which left DEEP unchanged. Existing saved configuration overrides defaults. Model overrides do not set a thinking level.
 
-One Decision batch assesses effort, stakes, and context completeness. FAST requires LOW probability ≥ 0.97, confidence ≥ 0.90, stakes probability ≤ 0.05, and standalone probability ≥ 0.95. HIGH effort or stakes probability ≥ 0.70 produces DEEP. Probabilities are estimates, not calibrated safety guarantees.
+One Decision batch assesses effort, stakes, and context completeness. FAST requires LOW probability ≥ 0.97, confidence ≥ 0.90, stakes probability ≤ 0.05, and standalone probability ≥ 0.95. DEEP requires a HIGH effort choice, HIGH probability ≥ 0.90, confidence ≥ 0.90, and standalone probability ≥ 0.95. High stakes alone retain the baseline and still block FAST. Probabilities are estimates, not calibrated safety guarantees.
 
 Manual model pins (including inherited pins), attachments, ambiguous short follow-ups, sensitive or oversized evidence, unsupported triggers, scheduled jobs, subagents, invalid decisions, errors, and timeouts produce no override. The early hook is not an authentication boundary: it accepts the host's user trigger and rejects explicit internal provenance, but cannot recover missing sender identity.
+
+## Changes in 1.0.14
+
+Astra escalation now requires clear HIGH effort with sufficient confidence and context. Stakes alone no longer select Astra. The default deepProbability is 0.90; existing saved values are not overwritten, so set it to 0.90 when upgrading. The existing minConfidence and minStandaloneProbability settings apply to both FAST and DEEP. Routing changes only the model, not reasoning effort.
 
 ## Changes in 1.0.13
 
@@ -35,7 +39,7 @@ From this repository:
 ```sh
 npm test
 npm pack
-openclaw plugins install ./model-auto-router-1.0.13.tgz
+openclaw plugins install ./model-auto-router-1.0.14.tgz
 ```
 
 For an existing installation, use the supported update flow, adding `--force` where appropriate. Preserve existing plugin allowlists and Decision-provider configuration. Inspect installation errors before retrying; the included Doctor artifact declares no stored-data migrations.
@@ -82,7 +86,7 @@ openclaw plugins reload model-auto-router
   "minConfidence": 0.9,
   "maxHighStakesProbability": 0.05,
   "minStandaloneProbability": 0.95,
-  "deepProbability": 0.7,
+  "deepProbability": 0.9,
   "allowDecisionContent": false
 }
 ```
@@ -109,7 +113,7 @@ No session-model restoration is needed. Keep the Decision provider installed if 
 
 ## Validation
 
-`npm test` runs 27 dependency-free behavior tests, including per-agent identity, scope, tier routing, manual pins, cross-agent ancestry, attachment guards, privacy, cancellation, timeouts, and bounded buffers. These use mocked host/provider interfaces; they do not prove current Jev calibration or full host compatibility.
+`npm test` runs 29 dependency-free behavior tests, including per-agent identity, scope, tier routing, manual pins, cross-agent ancestry, attachment guards, privacy, cancellation, timeouts, and bounded buffers. These use mocked host/provider interfaces; they do not prove current Jev calibration or full host compatibility.
 
 The original 1.0.10 FAST-only policy was separately exercised live on OpenClaw 2026.9.7. Its requested Luna → Astra → Astra sequence was confirmed using response timestamp model tooltips. That evidence does not establish live validation of the latest all-agent/DEEP-routing changes.
 
